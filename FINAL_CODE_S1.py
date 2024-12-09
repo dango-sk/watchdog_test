@@ -1,9 +1,14 @@
 # 01. 엑셀 데이터 불러오기 ############################################################################################
+import sys
 import pandas as pd
 import numpy as np
+import os
 from sklearn.linear_model import LinearRegression
 
-df = pd.read_excel('C:/Python_coding/FINAL/2024_3Q.xlsx', sheet_name='1차', skiprows=12)
+# 엑셀 파일 경로를 명령줄 인자로 받기
+file_path = "Z:\남수경\quant\watchdog_test"
+
+df = pd.read_excel(file_path, sheet_name='1차', skiprows=12)
 
 # 02. 데이터 스크리닝 #################################################################################################
 ## 1) 시가총액 3천억 미만 삭제
@@ -28,9 +33,9 @@ df = df.sort_values(by='시가총액', ascending=False)
 df_large = df[df['MKTCAP_C']=='Large']
 df_Small = df[df['MKTCAP_C']=='Medium']
 
-df.to_excel('C:/Python_coding/QUANT_S1.xlsx', index=False)
-df_large.to_excel('C:/Python_coding/QUANT_Large.xlsx', index=False)
-df_Small.to_excel('C:/Python_coding/QUANT_Small.xlsx', index=False)
+df.to_excel(file_path+'QUANT_S1.xlsx', index=False)
+df_large.to_excel(file_path+'QUANT_Large.xlsx', index=False)
+df_Small.to_excel(file_path+'QUANT_Small.xlsx', index=False)
 
 ######################################################################################################################
 ### LARGE CAP & SMALL CAP 실행 시 변경 ###
@@ -227,5 +232,16 @@ df['EV_NDT2'] = df['EVEBIT_C_E']*df['EBIT_R']-df['순부채_R'].astype(int)
 df['ATT_EVEBIT'] = df['EV_NDT2']/df['시가총액']-1
 
 # 09. DATA 출력
-#df.to_excel('C:/Python_coding/FINAL/QUANT_LARGE_OUTPUT_20243Q.xlsx', index=False)
-df.to_excel('C:/Python_coding/FINAL/QUANT_SMALL_OUTPUT_20243Q.xlsx', index=False)
+# 파일 이름에서 날짜 부분만 추출 (예: 20240912)
+file_name = os.path.basename(file_path)  # 파일명만 추출
+date_str = file_name.split('__')[0]  # '__' 앞부분을 날짜로 추출
+
+# 새로운 파일 이름 만들기 (예: 'QUANT_SMALL_OUTPUT_20240912.xlsx')
+output_large_file_name  = f"QUANT_LARGE_OUTPUT_{date_str}.xlsx"
+output_small_file_name  = f"QUANT_SMALL_OUTPUT_{date_str}.xlsx"
+
+# 04. 결과를 엑셀 파일로 저장 (Large 파일과 Small 파일을 각각 저장)
+df.to_excel(output_large_file_name, index=False)
+df.to_excel(output_small_file_name, index=False)
+
+print(f"결과 파일이 저장되었습니다: {output_large_file_name} 및 {output_small_file_name}")
